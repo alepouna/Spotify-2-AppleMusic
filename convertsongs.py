@@ -1,11 +1,11 @@
 from sys import argv
-import sys
 import csv
 import urllib.parse, urllib.request
 import json
 from time import sleep
 import requests
 import os
+from error_messages import SSL_ERROR_FIX, COMMAND_LINE_ERROR, ERROR_401, ERROR_403, CSV_FORMAT_INVALID
 
 # Delay (in seconds) to wait between tracks (to avoid getting rate limted) - reduce at own risk
 delay = 1
@@ -14,8 +14,8 @@ delay = 1
 if len(argv) > 1 and argv[1]:
     pass
 else:
-    print('\nCommand usage:\npython3 convertsongs.py yourplaylist.csv\nMore info at https://github.com/therealmarius/Spotify-2-AppleMusic')
-    exit()
+    print(COMMAND_LINE_ERROR)
+    exit(1)
 
 # Function to get contents of file if it exists
 def get_connection_data(f,prompt):
@@ -45,14 +45,14 @@ def create_apple_music_playlist(session, playlist_name):
         sleep(0.2)
         return response.json()['data'][0]['id']
     elif response.status_code == 401:
-        print("\nError 401: Unauthorized. Please refer to the README and check you have entered your Bearer Token, Media-User-Token and session cookies.\n")
-        sys.exit(1)
+        print(ERROR_401)
+        exit(1)
     elif response.status_code == 403:
-        print("\nError 403: Forbidden. Please refer to the README and check you have entered your Bearer Token, Media-User-Token and session cookies.\n")
-        sys.exit(1)
+        print(ERROR_403)
+        exit(1)
     else:
         raise Exception(f"Error {response.status_code} while creating playlist {playlist_name}!")
-        sys.exit(1)
+        exit(1)
     
 # Getting user's data for the connection
 token = get_connection_data("token.dat", "\nPlease enter your Apple Music Authorization (Bearer token):\n")
@@ -77,13 +77,7 @@ def get_itunes_id(title, artist, album):
         except Exception as e1:
             print(e1)
             if ("SSL: CERTIFICATE_VERIFY_FAILED" in e1):
-                print("""
-                This issue is likey because of missing certification for macOS.
-                Here are the steps to solution:
-                1. Open the folder /Applications/Python 3.x (x is the version you are running).
-                2. Double click the Install Certificates.command. It will open a terminal and install the certificate.
-                3. Rerun this script.
-                """)                
+                print(SSL_ERROR_FIX)
             exit(1)
         data = json.loads(response.read().decode('utf-8'))
         # If no result, search for the title + artist
@@ -165,7 +159,6 @@ def match_isrc_to_itunes_id(session, album, album_artist, isrc):
         for each in data['data']:
             isrc_album_name = escape_apostrophes(each['attributes']['albumName'].lower())
             isrc_artist_name = escape_apostrophes(each['attributes']['artistName'].lower())
-            isrc_track_name = escape_apostrophes(each['attributes']['name'].lower())
             
             if isrc_album_name == album.lower() and isrc_artist_name == album_artist.lower():
                 return each['id']
@@ -265,7 +258,7 @@ def create_playlist_and_add_song(file):
         file = csv.reader(file)
         header_row = next(file)
         if header_row[1] != 'Track Name' or header_row[3] != 'Artist Name(s)' or header_row[5] != 'Album Name' or header_row[16] != 'ISRC':
-            print('\nThe CSV file is not in the correct format!\nPlease be sure to download the CSV file(s) only from https://watsonbox.github.io/exportify/.\n\n')
+            print(CSV_FORMAT_INVALID)
             return
         # Initializing variables for the stats
         n = 0
@@ -332,7 +325,7 @@ if __name__ == "__main__":
                 if ".csv" in file:
                     create_playlist_and_add_song(os.path.join(argv[1], file))
 
+# Further developed by @nf1973 on GitHub
 # Developed by @therealmarius on GitHub
-# Based on the work of @simonschellaert on GitHub
-# Based on the work of @nf1973 on GitHub
-# Github project page: https://github.com/therealmarius/Spotify-2-AppleMusic
+# Based on the work of @simonschellaert and @nf1973 on GitHub
+# Github project page: https://github.com/nf1973/Spotify-2-AppleMusic
