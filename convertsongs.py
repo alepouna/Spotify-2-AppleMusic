@@ -5,10 +5,10 @@ import json
 from time import sleep
 import requests
 import os
-from error_messages import SSL_ERROR_FIX, COMMAND_LINE_ERROR, ERROR_401, ERROR_403, CSV_FORMAT_INVALID
+from text_strings import SSL_ERROR_FIX, COMMAND_LINE_ERROR, ERROR_401, ERROR_403, CSV_FORMAT_INVALID
 
 # Delay (in seconds) to wait between tracks (to avoid getting rate limted) - reduce at own risk
-delay = 1
+delay = 0.5
 
 # Checking if the command is correct
 if len(argv) > 1 and argv[1]:
