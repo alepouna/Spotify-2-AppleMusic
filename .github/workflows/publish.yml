@@ -4,11 +4,11 @@ on:
   push:
     branches:
       - master
-    # paths:
-    #   - Dockerfile
-    #   - docker-compose.yml
-    #   - requirements.txt
-    #   - "**.py"
+    paths:
+      - Dockerfile
+      - docker-compose.yml
+      - requirements.txt
+      - "**.py"
 
 jobs:
   build-and-publish:
