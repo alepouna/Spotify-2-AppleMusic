@@ -10,13 +10,6 @@ import os
 # Delay (in seconds) to wait between tracks (to avoid getting rate limted) - reduce at own risk
 delay = int(os.getenv("DELAY", 1))
 
-# Checking if the command is correct
-if len(argv) > 1 and argv[1]:
-    pass
-else:
-    print('\nCommand usage:\npython3 convertsongs.py yourplaylist.csv\nMore info at https://github.com/therealmarius/Spotify-2-AppleMusic')
-    exit()
-
 # Function to get contents of file if it exists
 def get_connection_data(f):
     if os.path.exists(f):
