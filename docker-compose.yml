@@ -1,0 +1,8 @@
+services:
+  spotify2apple:
+    image: ghcr.io/alepouna/Spotify-2-AppleMusic/spotify-to-applemusic:latest
+    volumes:
+      - 'spotify2apple-data:/app/data'
+    environment:
+      - PYTHONUNBUFFERED=1
+    entrypoint: ["python3", "convertsongs.py"]

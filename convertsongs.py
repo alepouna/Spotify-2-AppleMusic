@@ -18,12 +18,14 @@ else:
     exit()
 
 # Function to get contents of file if it exists
-def get_connection_data(f,prompt):
+def get_connection_data(f):
     if os.path.exists(f):
         with open(f,'r') as file:
             return file.read().rstrip('\n')
     else:
-            return input(prompt)
+            # Exit
+        print(f"Error: Couldn't not find {f}")
+        sys.exit(1)   
 
 def create_apple_music_playlist(session, playlist_name):
     url = "https://amp-api.music.apple.com/v1/me/library/playlists"
@@ -55,10 +57,10 @@ def create_apple_music_playlist(session, playlist_name):
         sys.exit(1)
     
 # Getting user's data for the connection
-token = get_connection_data("token.dat", "\nPlease enter your Apple Music Authorization (Bearer token):\n")
-media_user_token = get_connection_data("media_user_token.dat", "\nPlease enter your media user token:\n")
-cookies = get_connection_data("cookies.dat", "\nPlease enter your cookies:\n")
-country_code = get_connection_data("country_code.dat", "\nPlease enter the country code (e.g., FR, UK, US etc.): ")
+token = get_connection_data("/app/data/token.dat")
+media_user_token = get_connection_data("/app/data/media_user_token.dat")
+cookies = get_connection_data("/app/data/cookies.dat")
+country_code = get_connection_data("/app/data/country_code.dat")
 
 # function to escape apostrophes
 def escape_apostrophes(s):
@@ -321,17 +323,23 @@ def create_playlist_and_add_song(file):
 
 
 if __name__ == "__main__":
-    if len(argv) > 1 and argv[1]:
-        if ".csv" in argv[1]:
-            create_playlist_and_add_song(argv[1])
-        else:
-            # get all csv files in the directory argv[1]
-            files = [f for f in os.listdir(argv[1]) if os.path.isfile(os.path.join(argv[1], f))]
-            # loop through all csv files
-            for file in files:
-                if ".csv" in file:
-                    create_playlist_and_add_song(os.path.join(argv[1], file))
+    csv_folder = "/app/data/playlists" # Mountable folder
 
+    if not os.path.exists(csv_folder):
+        print(f"Error: Directory {csv_folder} does not exist.")
+        sys.exit(1)
+
+    csv_files = [f for f in os.listdir(csv_folder) if f.endswith('.csv')]
+
+    if not csv_files:
+        print(f"No CSV files found in {csv_folder}. From air, we can't create playlists!")
+        sys.exit(1)
+
+    for csv_file in csv_files:
+        file_path = os.path.join(csv_folder, csv_file)
+        create_playlist_and_add_song(file_path)
+
+# Docker-ified by @alepouna on GitHub
 # Developed by @therealmarius on GitHub
 # Based on the work of @simonschellaert on GitHub
 # Based on the work of @nf1973 on GitHub
