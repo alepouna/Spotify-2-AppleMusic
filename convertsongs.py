@@ -8,7 +8,7 @@ import requests
 import os
 
 # Delay (in seconds) to wait between tracks (to avoid getting rate limted) - reduce at own risk
-delay = 1
+delay = int(os.getenv("DELAY", 1))
 
 # Checking if the command is correct
 if len(argv) > 1 and argv[1]:
